@@ -1,0 +1,15 @@
+# Dependencias básicas
+confluent-kafka==2.6.1
+pyspark==3.5.3
+pandas>=1.3.0
+
+# Machine Learning
+tensorflow==2.12.0
+scikit-learn==1.3.0
+numpy>=1.21.0
+
+# Visualización
+matplotlib>=3.4.0
+seaborn>=0.11.0
+plotly==5.22.0
+
