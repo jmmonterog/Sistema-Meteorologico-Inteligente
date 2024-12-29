@@ -1,0 +1,67 @@
+CODMETEOALERTA;NOMBRE;OACI;NOCUE;DEFENSA;NO_PERSONAL;OMAe;OMAe_alternativa;METAR;TAF;INDICADORES_METAR;INDICADORES_TAF;AVISOS_AERODROMO;AVISOS_RAYOS;AVISOS_TORMENTA;PAM;Nivel Servicio;Gestor ATS;Fase METAR AUTO;Tipo Terminal;IP;Usuario;Contraseña
+711501;A Coruña;LECO;;;;OMAe_NORTE;OMAe_ESTE;X;X;X;X;X;X;X;X;2;FerroNats;0;Tiempo;172.24.201.181;sainco;XXXXXX
+743104;Ablitas;LETU;X;X;X;;;X;;;;;;;;;Sin;;Vaisala;172.24.235.11;sainco;XXXXXX;743104;680201
+680201;Albacete;LEAB;;;;OMAe_INTERIOR;OMAe_SUR;X;X;X;X;X;X;X;X;2;Defensa;;Midas;172.24.232.81;sainco;XXXXXX
+611104;Algeciras;LEAG;;;X;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;X;;1;Sin;;Avimet;172.24.128.151;sainco;XXXXXX;
+770303;Alicante;LEAL;;;;OMAe_ESTE;OMAe_CANARIAS;X;X;X;X;X;X;X;X;3;FerroNats;;Tiempo;172.24.171.181;sainco;XXXXXX
+610403;Almería;LEAM;;;;OMAe_SUR;OMAe_INTERIOR;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.178.181;sainco;XXXXXX
+692502;Andorra-La Seu d Urgell;LESU;;;;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;;2;FerroNats;;;172.24.209.10;sainco;XXXXXX
+633304;Asturias;LEAS;;;;OMAe_NORTE;OMAe_ESTE;X;X;X;X;X;X;X;X;3;Enaire;0;Tiempo;172.24.192.181;sainco;XXXXXX
+700601;Badajoz / Talavera la Real;LEBZ;;;;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;X;X;2;Defensa;;Tiempo;172.24.230.21;sainco;XXXXXX
+690804;Barcelona;LEBL;;;;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;X;4;Enaire;;Tiempo;172.24.169.181;sainco;XXXXXX
+743104;Bardenas;LEBR;X;X;X;OMAe_NORTE;OMAe_INTERIOR;X;X;;;;X;X;X;;Sin;;Vaisala;172.24.236.11;sainco;XXXXXX
+754802;Bilbao;LEBB;;;;OMAe_NORTE;OMAe_ESTE;X;X;X;X;X;X;X;X;3;Enaire;0;Tiempo;172.24.173.181;telvent;XXXXXX
+670904;Burgos;LEBG;;;;OMAe_INTERIOR;OMAe_NORTE;X;X;X;X;X;X;X;X;2;Saerco;0;Tiempo;172.24.194.181;sainco;XXXXXX
+611103;Cádiz / Rota;LERT;X;X;;OMAe_SUR;OMAe_CANARIAS;X;X;;;X;X;X;X;2;Saerco;;Tiempo;172.24.205.181;telvent;XXXXXX
+771204;Castellón;LECH;;;;OMAe_ESTE;OMAe_SUR;X;X;X;X;X;X;X;;2;Saerco;2;Tiempo;172.24.203.10;sainco;XXXXXX
+785101;Ceuta;GECE;X;X;;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;X;X;2;Saerco;;Tiempo;172.24.205.181;telvent;XXXXXX
+681303;Ciudad Real;LERL;;;;OMAe_INTERIOR;OMAe_SUR;X;X;X;X;X;X;X;;;Defensa;;Tiempo;172.24.233.81;sainco;XXXXXX
+681302;Ciudad Real / Almagro;LEAO;X;X;;OMAe_INTERIOR;OMAe_CANARIAS;X;X;;;X;X;X;X;;Defensa;;Tiempo;172.24.226.28;sainco;XXXXXX
+611402;Córdoba;LEBA;;;;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;;X;2;FerroNats AFIS;0;Tiempo;172.24.176.181;sainco;XXXXXX
+659501;El Hierro;GCHI;;;;OMAe_CANARIAS;OMAe_SUR;X;X;X;X;X;X;;X;2;Saerco AFIS;0;Tiempo;172.24.186.181;sainco;XXXXXX
+659201;Fuerteventura;GCFV;;;;OMAe_CANARIAS;OMAe_ESTE;X;X;X;X;X;X;X;X;3;Saerco;0;Tiempo;172.24.189.181;TELVENT;XXXXXX
+691702;Girona;LEGE;;;;OMAe_ESTE;OMAe_CANARIAS;X;X;X;X;X;X;X;X;3;Enaire;;Tiempo;172.24.195.181;sainco;XXXXXX
+659001;Gran Canaria;GCLP;;X;;OMAe_CANARIAS;OMAe_ESTE;X;X;X;X;X;X;;X;4;Enaire;;Tiempo;172.24.168.181;sainco;XXXXXX
+611801;Granada;LEGR;;;;OMAe_SUR;OMAe_INTERIOR;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.179.181;sainco;XXXXXX
+611801;Granada / Armilla;LEGA;X;X;;OMAe_SUR;OMAe_INTERIOR;X;X;;;X;X;X;;;Defensa;;;;sainco;XXXXXX
+622202;Huesca / Pirineos;LEHC;;;;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;;2;Saerco;0;Tiempo;172.24.183.181;MC1LEIB;LEIB128
+645301;Ibiza;LEIB;;;;OMAe_ESTE;OMAe_CANARIAS;X;X;X;X;X;X;X;X;3;FerroNats;0;Metconsole;172.24.184.184;sainco;XXXXXX
+611102;Jerez;LEJR;;;;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;X;X;2;FerroNats;0;Tiempo;172.24.177.181;sainco;XXXXXX
+659401;La Gomera;GCGM;;;;OMAe_CANARIAS;OMAe_SUR;X;X;X;X;X;X;;;2;Saerco AFIS;0;Tiempo;172.24.187.181;sainco;XXXXXX
+659303;La Palma;GCLA;;;;OMAe_CANARIAS;OMAe_SUR;X;X;X;X;X;X;;X;2;Saerco;0;Tiempo;172.24.188.181;sainco;XXXXXX
+659101;Lanzarote;GCRR;;;;OMAe_CANARIAS;OMAe_ESTE;X;X;X;X;X;X;;X;3;Saerco;0;Tiempo;172.24.190.181;sainco;XXXXXX
+672403;León / Virgen del Camino;LELN;;X;;OMAe_INTERIOR;OMAe_NORTE;X;X;X;X;X;X;X;X;2;Defensa;0;Tiempo;172.24.228.181;;XXXXXX
+692503;Lleida;LEDA;;;;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;;2;FerroNats;0;Tiempo;172.24.196.181;sainco;XXXXXX
+762601;Logroño / Agoncillo;LELO;;X;;OMAe_INTERIOR;OMAe_NORTE;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.227.81;sainco;XXXXXX
+722802;Madrid / Adolfo Suárez Madrid-Barajas;LEMD;;;;OMAe_INTERIOR;OMAe_NORTE;X;X;X;X;X;X;X;X;4;Defensa;;Tiempo;172.24.170.181;sainco;XXXXXX
+722802;Madrid / Colmenar Viejo;LECV;X;X;;OMAe_INTERIOR;OMAe_SUR;X;X;;;X;X;X;X;;Defensa;;Tiempo;172.24.233.181;sainco;XXXXXX
+722802;Madrid / Cuatro Vientos;LEVS;;X;;OMAe_INTERIOR;OMAe_SUR;X;X;X;X;X;X;X;X;2;FerroNats;;Tiempo;172.24.231.81;sainco;XXXXXX
+722802;Madrid / Getafe;LEGT;X;X;;OMAe_INTERIOR;OMAe_SUR;X;X;;;X;X;X;X;;Defensa;;Metconsole;172.24.231.158;sainco;XXXXXX
+722802;Madrid / Torrejón;LETO;X;X;;OMAe_INTERIOR;OMAe_SUR;X;X;;;X;X;X;X;;Defensa;;Tiempo;172.24.232.181;sainco;XXXXXX
+612903;Málaga;LEMG;;;;OMAe_SUR;OMAe_INTERIOR;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.180.181;sainco;XXXXXX
+795201;Melilla;GEML;;;;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;X;X;3;Enaire;0;Metconsole;172.24.185.181;telvent;XXXXXX
+645501;Menorca;LEMH;;;;OMAe_ESTE;OMAe_INTERIOR;X;X;X;X;X;X;X;X;;Defensa;;Metconsole;172.24.234.156;sainco;XXXXXX
+733003;Murcia / Alcantarilla;LERI;X;X;;OMAe_SUR;OMAe_INTERIOR;X;X;;;X;X;X;;2;FerroNats;0;Tiempo;172.24.204.181;sainco;XXXXXX
+733003;Murcia / Región de Murcia;LEMI;;;;OMAe_SUR;OMAe_INTERIOR;X;X;X;X;X;X;X;;;Defensa;0;Tiempo;172.24.237.81;sainco;XXXXXX
+733005;Murcia / San Javier;LELC;;X;;OMAe_SUR;OMAe_INTERIOR;X;X;;X;X;X;X;X;3;Enaire;;Tiempo;172.24.165.181;sainco;XXXXXX
+645404;Palma / Son Bonet;LESB;;;X;OMAe_ESTE;OMAe_CANARIAS;X;;X;;X;X;X;;1;Sin;;Metconsole;172.24.10.2;sainco;XXXXXX
+645404;Palma de Mallorca;LEPA;;;;OMAe_ESTE;OMAe_CANARIAS;X;X;X;X;X;X;X;X;4;Enaire;;Tiempo;172.24.166.181;sainco;XXXXXX
+31201;Pamplona;LEPP;;;;OMAe_NORTE;OMAe_INTERIOR;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.181.181;sainco;XXXXXX
+694303;Reus;LERS;;;;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.198.181;sainco;XXXXXX
+690803;Sabadell;LELL;;;;OMAe_ESTE;OMAe_CANARIAS;X;X;X;X;X;X;X;;2;FerroNats;0;Tiempo;172.24.197.181;sainco;XXXXXX
+673701;Salamanca / Matacán;LESA;;X;;OMAe_INTERIOR;OMAe_NORTE;X;X;X;X;X;X;X;X;2;Defensa;0;Tiempo;172.24.229.81;sainco;XXXXXX
+752001;San Sebastián;LESO;;;;OMAe_NORTE;OMAe_ESTE;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.199.181;sainco;XXXXXX
+663901;Santander;LEXJ;;;;OMAe_NORTE;OMAe_ESTE;X;X;X;X;X;X;X;X;2;Enaire;0;Tiempo;172.24.193.181;sainco;XXXXXX
+711503;Santiago;LEST;;;;OMAe_NORTE;OMAe_INTERIOR;X;X;X;X;X;X;X;X;3;Enaire;;Tiempo;172.24.174.181;sainco;XXXXXX
+614102;Sevilla;LEZL;;;;OMAe_SUR;OMAe_CANARIAS;X;X;X;X;X;X;X;X;2;FerroNats;0;Tiempo;172.24.172.181;sainco;XXXXXX
+614102;Sevilla / El Copero;LEEC;X;X;;OMAe_SUR;OMAe_CANARIAS;X;X;;;X;X;X;X;;Defensa;;;172.24.225.181;sainco;XXXXXX
+614102;Sevilla / Morón;LEMO;X;X;;OMAe_SUR;OMAe_CANARIAS;X;X;;;X;X;X;X;;Defensa;;Metconsole;172.24.225.29;sainco;XXXXXX
+659602;Tenerife Norte;GCXO;;;;OMAe_CANARIAS;OMAe_ESTE;X;X;X;X;X;X;;;4;Enaire;0;Tiempo;172.24.208.181;sainco;XXXXXX
+659603;Tenerife Sur;GCTS;;;;OMAe_CANARIAS;OMAe_SUR;X;X;X;X;X;X;;X;4;Enaire;;Tiempo;172.24.167.181;sainco;XXXXXX
+624401;Teruel;LETL;;;X;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;;1;Sin;;Tiempo;10.0.0.149;sainco;XXXXXX
+774602;Valencia;LEVC;;;;OMAe_ESTE;OMAe_CANARIAS;X;X;X;X;X;X;X;X;3;FerroNats;;Tiempo;172.24.175.181;sainco;XXXXXX
+774602;Valencia / Bétera;LEBT;X;X;;;OMAe_CANARIAS;X;;;;;X;X;;;Defensa;;Tiempo;172.24.237.181;sainco;XXXXXX
+674701;Valladolid / Villanubla;LEVD;;X;;OMAe_INTERIOR;OMAe_NORTE;X;X;X;X;X;X;X;X;2;Defensa;0;Tiempo;172.24.229.181;sainco;XXXXXX
+713601;Vigo;LEVX;;;;OMAe_NORTE;OMAe_ESTE;X;X;X;X;X;X;X;X;3;FerroNats;;Tiempo;172.24.202.181;sainco;XXXXXX
+750102;Vitoria;LEVT;;;;OMAe_NORTE;OMAe_INTERIOR;X;X;X;X;X;X;X;X;2;Enaire;;Tiempo;172.24.200.181;sainco;XXXXXX
+625003;Zaragoza;LEZG;;;;OMAe_ESTE;OMAe_NORTE;X;X;X;X;X;X;X;X;3;Enaire;;Tiempo;172.24.182.181;sainco;XXXXXX
