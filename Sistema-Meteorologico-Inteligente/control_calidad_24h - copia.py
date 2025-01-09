@@ -2,7 +2,6 @@ import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, from_json, struct, to_json
 from pyspark.sql.types import StructType, StringType, DoubleType, BooleanType
-from pyspark.sql.types import StructField
 from pyspark.ml.feature import VectorAssembler, StandardScaler
 from pyspark.ml.clustering import BisectingKMeans
 from pyspark.ml.linalg import Vectors
@@ -75,7 +74,7 @@ def detect_anomalies_in_batch(iterator):
         return pdf.values.tolist()
     return []
 
-result_schema = StructType(data.schema.fields + [StructField("anomaly", StringType(), True)])
+result_schema = StructType(data.schema.fields + [StructType([StringType()]).add("anomaly", StringType())])
 data_anomalies = data_vectorized.rdd.mapPartitions(detect_anomalies_in_batch).toDF(schema=result_schema)
 
 # Publicar resultados en Kafka
@@ -83,7 +82,7 @@ result_stream = data_anomalies.select(to_json(struct([col(c) for c in data_anoma
 result_stream.writeStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "localhost:9092") \
-    .option("topic", "control_calidad") \
+    .option("topic", "anomalies_detected") \
     .option("checkpointLocation", "./checkpoints/anomalies") \
     .start()
 

@@ -4,7 +4,7 @@ from time import sleep
 from confluent_kafka import Producer
 
 # Ruta al archivo CSV
-csv_file_path = "C:\\Users\\AEMet\\Documents\\TFM\\metars\\INPUT_METARS.csv"
+csv_file_path = "../data/INPUT_METARS.csv"
 
 # Configuración del productor de Kafka
 producer_config = {

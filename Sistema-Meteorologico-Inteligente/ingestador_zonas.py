@@ -49,7 +49,7 @@ if __name__ == "__main__":
     }
 
     # Ruta del fichero CSV
-    file_path = 'zonas_meteoalerta.csv'
+    file_path = '../data/zonas_meteoalerta.csv'
 
     # Tópico Kafka de destino
     kafka_topic = 'zonas_topico'

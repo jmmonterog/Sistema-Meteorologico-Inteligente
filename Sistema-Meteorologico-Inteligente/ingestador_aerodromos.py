@@ -52,7 +52,7 @@ if __name__ == "__main__":
     }
 
     # Configuración del archivo CSV y el tópico Kafka
-    csv_file_path = "aerodromos.csv"  # Cambiar a la ruta del archivo CSV
+    csv_file_path = "../data/aerodromos.csv"  # Cambiar a la ruta del archivo CSV
     kafka_topic = "aerodromos_topico"
 
     # Ejecutar el ingestador

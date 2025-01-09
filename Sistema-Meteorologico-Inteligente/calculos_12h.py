@@ -1,7 +1,9 @@
 import os
+import sys
 
-os.environ['PYSPARK_PYTHON'] = 'C:\\Users\\AEMet\\anaconda3\\envs\\environment_uoc20232pec3-actual\\python.exe'  # Intérprete Python para ejecutores
-os.environ['PYSPARK_DRIVER_PYTHON'] = 'C:\\Users\\AEMet\\anaconda3\\envs\\environment_uoc20232pec3-actual\\python.exe'  # Intérprete Python para el driver
+# Configurar PySpark para usar el Python del entorno virtual actual
+os.environ['PYSPARK_PYTHON'] = sys.executable  # Intérprete Python para ejecutores
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable  # Intérprete Python para el driver
 
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, window, expr, current_timestamp, lit, when, udf
@@ -163,7 +165,7 @@ def process_metars(kafka_bootstrap_servers, input_topic, output_topic,checkpoint
     # Agregaciones por ventana de 12 horas
     ventana_12h = metars_filtered.groupBy(
         col("CodigoOACI"),
-        window(col("FechaHoraNominal"), "12 hour", "30 minute")
+        window(col("FechaHoraNominal"),"12 hour", "30 minute")
     ).agg(
         expr("MAX(IntensidadViento) AS max_intensidad_viento"),
         expr("MAX(Temperatura) AS max_temperatura"),
@@ -190,17 +192,15 @@ def process_metars(kafka_bootstrap_servers, input_topic, output_topic,checkpoint
     ventana_12h = ventana_12h.withColumn(
         "end", expr("end - INTERVAL 1 SECOND")
     )
-    
-
 
     # Guardar resultados en el DataLake en formato Parquet
     result_to_datalake = ventana_12h.writeStream \
-        .outputMode("Append") \
-        .partitionBy("CodigoOACI") \
         .format("parquet") \
-        .option("checkpointLocation",f"{checkpoint_location}/calculos_agregados_12h_02") \
-	.trigger(processingTime="1 second") \
-        .start(f"{datalake_path}/calculos_12h_02")
+        .outputMode("append") \
+        .partitionBy("CodigoOACI") \
+        .option("path", f"{datalake_path}/calculos_12h") \
+        .option("checkpointLocation",f"{checkpoint_location}/parquet_calculos_12h") \
+        .start()
 
     # Escribir resultados al tópico Kafka calculos_12h
     result_to_kafka = ventana_12h.selectExpr("to_json(struct(*)) AS value").writeStream \
@@ -208,7 +208,7 @@ def process_metars(kafka_bootstrap_servers, input_topic, output_topic,checkpoint
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("topic", output_topic) \
-        .option("checkpointLocation", f"{checkpoint_location}/calculos_agregados_12h_02") \
+        .option("checkpointLocation", f"{checkpoint_location}/kafka_calculos_12h") \
         .start()
     
 
@@ -216,27 +216,11 @@ def process_metars(kafka_bootstrap_servers, input_topic, output_topic,checkpoint
     # Esperar terminación
     result_to_datalake.awaitTermination()
     result_to_kafka.awaitTermination()
-    #spark.streams.awaitAnyTermination()
-
-
-    '''
-    # Escribir en consola
-    query = ventana_12h.selectExpr("to_json(struct(*)) AS value").writeStream \
-	    .outputMode("complete") \
-	    .format("console") \
- 	    .option("truncate", "false") \
-	    .start()
-     
-    query.awaitTermination()
-    '''
-   
-    
-	
 
 # Parámetros de configuración
 kafka_bootstrap_servers = "localhost:9092"
 input_topic = "metars_limpios_topico"
 output_topic = "calculos_12h"
 
-process_metars('localhost:9092', 'metars_limpios_topico', 'calculos_12h', 'C:\spark-checkpoint', 'C:\spark-datalake')
+process_metars('localhost:9092', 'metars_limpios_topico', 'calculos_12h', "file:///C:/spark-checkpoint", "file:///C:/spark-datalake")
 

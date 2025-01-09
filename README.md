@@ -72,11 +72,58 @@ El sistema consta de los siguientes módulos principales:
    env\Scripts\activate        # Windows
    ```
 
-### **Instalar las dependencias necesarias**
-Ejecuta el siguiente comando para instalar todas las dependencias requeridas por el proyecto:
+2. En el directorio del proyecto, ejecuta el siguiente comando para instalar todas las dependencias requeridas por el proyecto:
 
 ```bash
 pip install -r requirements.txt
+```
+
+### **Ingestar los datos de observación meteorológica aeronáutica (METARS)**
+Para ingestar los METARS que utilizaremos en el proyecto se debe ejecutar el siguiente script con el intérprete Python que hemos configurado:
+
+```bash
+python ingestador_metars.py
+```
+
+### **Ingestar los metadatos de aeródromos**
+Para ingestar los metadatos de aeródromos que utilizaremos en el proyecto se debe ejecutar el siguiente script con el intérprete Python que hemos configurado:
+
+```bash
+python ingestador_aerodromos.py
+```
+
+### **Ingestar los datos de zonas de aviso del Plan Meteoalerta**
+Para ingestar la información de las zonas de avisos del Plan Meteoalerta (https://www.aemet.es/es/eltiempo/prediccion/avisos/ayuda/) que utilizaremos en el proyecto se debe ejecutar el siguiente script con el intérprete Python que hemos configurado:
+
+```bash
+python ingestador_zonas.py
+```
+
+### **Limpieza de METARS**
+Para realizar las tareas de limpieza de los METARS, evitar duplicados o aquellos que tienen campos esenciales faltantes, se debe ejecutar el script python
+
+```bash
+python limpiador_metars.py
+```
+
+### **Cálculo de agregaciones de 24h**
+Para calcular las agregaciones y cálculos relativos a 24h se debe ejecutar el script python
+
+```bash
+python calculos_24h.py
+```
+
+### **Cálculo de agregaciones de 12h**
+Para calcular las agregaciones y cálculos relativos a 12h se debe ejecutar el script python
+
+```bash
+python calculos_12h.py
+```
+### **Cálculo de agregaciones de 1h**
+Para calcular las agregaciones y cálculos relativos a 1h se debe ejecutar el script python
+
+```bash
+python calculos_1h.py
 ```
 
 

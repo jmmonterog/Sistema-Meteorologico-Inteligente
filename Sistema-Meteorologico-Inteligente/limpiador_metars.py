@@ -97,12 +97,12 @@ def process_metars(kafka_bootstrap_servers, input_topic, output_topic, checkpoin
 
     # Escribir el resultado al DataLake en formato Parquet 
     metars_stream_to_datalake = metars_stream_cleansed.writeStream \
-        .outputMode("Append") \
+	.format("parquet") \
+        .outputMode("append") \
         .partitionBy("CodigoOACI") \
-        .format("parquet") \
-        .option("checkpointLocation", f"{checkpoint_location}/limpiador_metars") \
-        .trigger(processingTime="1 second") \
-        .start(f"{datalake_path}/metars_limpios")
+	.option("path", f"{datalake_path}/metars_limpios") \
+        .option("checkpointLocation", f"{checkpoint_location}/parquet_limpiador_metars") \
+        .start()
 
     # Escribir el resultado al tópico Kafka
     query = metars_stream_cleansed.selectExpr("to_json(struct(*)) AS value") \
@@ -111,29 +111,14 @@ def process_metars(kafka_bootstrap_servers, input_topic, output_topic, checkpoin
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("topic", output_topic) \
-        .option("checkpointLocation", f"{checkpoint_location}/limpiador_metars") \
+        .option("checkpointLocation", f"{checkpoint_location}/kafka_limpiador_metars") \
         .start()
 
     # Esperar la terminación de ambos streams
     metars_stream_to_datalake.awaitTermination()
     query.awaitTermination()
+    #spark.streams.awaitAnyTermination()
 
-process_metars('localhost:9092', 'metars_topico', 'metars_limpios_topico', "C:\spark-checkpoint", "C:\spark-datalake")
+process_metars('localhost:9092', 'metars_topico', 'metars_limpios_topico', "file:///C:/spark-checkpoint", "file:///C:/spark-datalake")
 
 
-'''
-# Bloque para ejecutar desde un notebook o script
-if __name__ == "__main__":
-    if len(sys.argv) != 6:
-        print("Usage: python limpiador_metars.py <kafka_bootstrap_servers> <input_topic> <output_topic> <checkpoint_location> <datalake_path>")
-        sys.exit(-1)
-
-    kafka_bootstrap_servers = sys.argv[1]
-    input_topic = sys.argv[2]
-    output_topic = sys.argv[3]
-    checkpoint_location = sys.argv[4]
-    datalake_path = sys.argv[5]
-
-    process_metars(kafka_bootstrap_servers, input_topic, output_topic, checkpoint_location, datalake_path)
-
-'''
