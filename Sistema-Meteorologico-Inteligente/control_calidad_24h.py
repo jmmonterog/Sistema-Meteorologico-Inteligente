@@ -75,6 +75,7 @@ def detect_anomalies_in_batch(iterator):
         return pdf.values.tolist()
     return []
 
+
 result_schema = StructType(data.schema.fields + [StructField("anomaly", StringType(), True)])
 data_anomalies = data_vectorized.rdd.mapPartitions(detect_anomalies_in_batch).toDF(schema=result_schema)
 
