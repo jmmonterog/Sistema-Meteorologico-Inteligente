@@ -67,15 +67,14 @@ El sistema consta de los siguientes módulos principales:
    cd Sistema-Meteorologico-Inteligente
    ```
 
-### **Instalación**
-1. Crea un entorno virtual (opcional pero recomendado):
+2. Crea un entorno virtual (opcional pero recomendado):
    ```bash
    python -m venv env
    source env/bin/activate     # Linux/MacOS
    env\Scripts\activate        # Windows
    ```
 
-2. En el directorio del proyecto, ejecuta el siguiente comando para instalar todas las dependencias requeridas por el proyecto:
+3. En el directorio del proyecto, ejecuta el siguiente comando para instalar todas las dependencias requeridas por el proyecto:
 
 ```bash
 pip install -r requirements.txt
