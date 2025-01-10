@@ -8,16 +8,15 @@ El sistema está diseñado para integrarse con plataformas existentes y ofrece f
 - Control de calidad y validación de datos en tiempo real.
 - Predicción de variables meteorológicas críticas.
 - Generación de alertas ante fenómenos adversos.
-- Visualización interactiva de datos mediante dashboards.
+- Generación de salidas en formatos interoperables utilizables en sistemas externos y otros sistemas de visualización.
 
 
 ## **Características Principales**
 - **Streaming en tiempo real**: Procesamiento masivo de datos meteorológicos con Apache Kafka y Spark.
 - **Machine Learning y predicción**:
   - Modelos como Isolation Forest y Redes Neuronales.
-  - Predicción de variables como viento, visibilidad y presión atmosférica.
+  - Predicción de variables meteorológicas como la precipitación.
 - **Control de calidad**: Algoritmos avanzados para validar y filtrar datos meteorológicos.
-- **Visualización interactiva**: Dashboards dinámicos para el análisis y toma de decisiones.
 
 
 ## **Requisitos**
@@ -26,14 +25,18 @@ Asegúrate de instalar las siguientes bibliotecas antes de ejecutar el proyecto:
 ```plaintext
 confluent-kafka==2.6.1
 pyspark==3.5.3
+pandas>=1.3.0
 tensorflow==2.12.0
 scikit-learn==1.3.0
 numpy>=1.21.0
-pandas>=1.3.0
+imbalanced-learn
+transformers==4.33.2
 matplotlib>=3.4.0
 seaborn>=0.11.0
 plotly==5.22.0
 ```
+### Otra infraestructura
+La infraestructura para el sistema de gestión de información meteorológica se basa en tecnologías de procesamiento en tiempo real y almacenamiento escalable. Se requiere Apache Kafka para la ingesta de datos en tiempo real provenientes de sensores meteorológicos, distribuidos en tópicos para su fácil acceso y procesamiento. Apache Spark es el núcleo del análisis, proporcionando un entorno distribuido y escalable para procesar grandes volúmenes de datos meteorológicos. La información procesada se almacena en un Data Lake, permitiendo la persistencia y consultas históricas de datos en formatos optimizados como Parquet. Para análisis predictivos y aprendizaje automático, se integran herramientas como TensorFlow/Keras y Spark MLlib. La infraestructura puede implementarse localmente o en plataformas en la nube como Azure Databricks, AWS EMR, o Google Cloud, que ofrecen escalabilidad y alta disponibilidad. Además, se puede utilizar herramientas de visualización como Grafana para la monitorización y análisis en tiempo real, garantizando una solución robusta y adaptable para gestionar datos meteorológicos críticos en aeródromos.
 
 ## **Arquitectura del Sistema**
 El sistema consta de los siguientes módulos principales:
@@ -125,5 +128,35 @@ Para calcular las agregaciones y cálculos relativos a 1h se debe ejecutar el sc
 ```bash
 python calculos_1h.py
 ```
+
+### **Cálculo de control calidad de observaciones 24h**
+Para realizar un control de calidad de las observaciones de 24h para otros procesos posteriores como los estudios y análisis climatológicos y su consolidación, por ejemplo, en Bancos Nacionales de Datos de Climatología, se debe ejecutar
+
+```bash
+python analisis_control_calidad_24h.py
+```
+
+### **Capacidades predictivas de predicción meteorológica (precipitación día siguiente)**
+Para realizar una predicción de precipitación para el día siguiente a partir de las observaciones del día vigente, se debe ejecutar 
+
+```bash
+python prediccion_lluvia_dia_siguiente.py
+```
+
+### **Capacidades de automatización de informes meteorológicos (boletines de predicción general)**
+Para generar boletines de predicción general automatizados a partir de los datos de observación, se debe ejecutar  
+
+```bash
+python informes_meteorologicos.py
+```
+
+### **Generación de avisos meteorológicos automatizados con los mismos umbrales del Plan Meteoalerta**
+Para generar avisos automatizados con los mismos umbrales del Plan Meteoalerta, se debe ejecutar  
+
+```bash
+python avisos_obs_1h.py
+```
+
+
 
 

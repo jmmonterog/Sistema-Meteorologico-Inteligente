@@ -1,8 +1,14 @@
 import os
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, to_json, struct, lit, when
+from pyspark.sql.functions import col, from_json, to_json, struct, lit, udf
 from pyspark.sql.types import StructType, StringType, DoubleType, BooleanType
+import pandas as pd
 from transformers import pipeline
+import sys
+
+# Configurar PySpark para usar el Python del entorno virtual actual
+os.environ['PYSPARK_PYTHON'] = sys.executable  # Intérprete Python para ejecutores
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable  # Intérprete Python para el driver
 
 # Configuración de PySpark
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-streaming_2.12:3.5.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3 pyspark-shell'
@@ -48,64 +54,45 @@ data = kafka_input_stream.selectExpr("CAST(value AS STRING) as json_string") \
     .select(from_json(col("json_string"), schema).alias("data")) \
     .select("data.*")
 
-# Crear resúmenes a partir de los datos
-def preparar_datos_para_informe(row):
-    """Toma una fila y crea un resumen basado en los datos meteorológicos."""
+# Generar resúmenes en el DataFrame
+@udf(returnType=StringType())
+def generar_resumen(row):
+    """Generar resumen directamente desde una fila."""
     resumen = []
     resumen.append(f"El día con inicio {row['start']} y fin {row['end']} en el aeródromo {row['CodigoOACI']} se registraron las siguientes condiciones:")
-
-    # Intensidad del viento
     if row['max_intensidad_viento'] > 20:
         resumen.append(f"Hubo vientos fuertes con una intensidad máxima de {row['max_intensidad_viento']} km/h.")
     else:
         resumen.append(f"Los vientos fueron moderados, alcanzando un máximo de {row['max_intensidad_viento']} km/h.")
-
-    # Nubosidad
     resumen.append(f"La cobertura nubosa predominante fue '{row['cobertura_predominante']}'.")
-
-    # Precipitación
     if row['hubo_precipitacion']:
         resumen.append("Se registraron precipitaciones durante el periodo.")
     else:
         resumen.append("No se registraron precipitaciones durante el periodo.")
-
-    # Temperatura
     resumen.append(f"La temperatura osciló entre {row['min_temperatura']}°C y {row['max_temperatura']}°C, con una media de {row['mean_temperatura']}°C.")
-
-    # Visibilidad
     resumen.append(f"La visibilidad máxima alcanzada fue de {row['max_visibilidad']} metros.")
-
     return " ".join(resumen)
 
-# Crear una función UDF para generar los resúmenes
-def generar_resumen(row):
-    return preparar_datos_para_informe(row.asDict())
+data = data.withColumn("Resumen", generar_resumen(struct([col(c) for c in data.columns])))
 
-generate_summary_udf = spark.udf.register("generar_resumen", generar_resumen, StringType())
-data = data.withColumn("Resumen", generate_summary_udf(struct([col(c) for c in data.columns])))
-
-# Generar informes detallados con NLP
-generator = pipeline("text2text-generation", model="facebook/bart-large-cnn")
-
-def generar_informe(resumen):
-    """Genera un informe detallado a partir de un resumen usando NLP."""
-    result = generator(resumen, max_length=200, min_length=50, do_sample=False)
-    return result[0]['generated_text']
-
-# Crear una función UDF para los informes
-def generar_informe_udf(row):
-    return generar_informe(row)
-
-generate_report_udf = spark.udf.register("generar_informe", generar_informe_udf, StringType())
-data = data.withColumn("Informe", generate_report_udf(col("Resumen")))
-
-# Publicar los informes en el tópico Kafka informes_meteorologicos_topico
-result_stream = data.select(to_json(struct([col(c) for c in data.columns])).alias("value"))
-result_stream.writeStream \
+# Publicar resúmenes en el tópico Kafka resúmenes_meteorologicos
+resumen_stream = data.select(to_json(struct([col("CodigoOACI"), col("Resumen")])).alias("value"))
+resumen_stream.writeStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "localhost:9092") \
-    .option("topic", "informes_meteorologicos_topico") \
-    .option("checkpointLocation", "./checkpoints/informes") \
+    .option("topic", "resumenes_meteorologicos") \
+    .option("checkpointLocation", "c:/spark-checkpoint/kafka_resumenes") \
+    .start()
+
+
+# Guardar resúmenes en Parquet
+output_path = "c:/spark-datalake/informes_meteorologicos"
+data.writeStream \
+    .format("parquet") \
+    .option("path", output_path) \
+    .option("checkpointLocation", "c:/spark-checkpoint/parquet_resumenes") \
+    .outputMode("append") \
+    .partitionBy("CodigoOACI") \
     .start()
 
 # Ejecutar el proceso de streaming

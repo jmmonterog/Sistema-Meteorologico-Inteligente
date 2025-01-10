@@ -1,6 +1,11 @@
 import os
 from pyspark.sql import SparkSession
 from pyspark.sql.functions import col, when, to_json, struct, lit
+import sys
+
+# Configurar PySpark para usar el Python del entorno virtual actual
+os.environ['PYSPARK_PYTHON'] = sys.executable  # Intérprete Python para ejecutores
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable  # Intérprete Python para el driver
 
 # Configuración para PySpark y Kafka
 os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3 pyspark-shell'
@@ -19,21 +24,21 @@ if __name__ == "__main__":
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("subscribe", "calculos_1h") \
-        .option("startingOffsets", "latest") \
+        .option("startingOffsets", "earliest") \
         .load()
 
     aerodromos_topico = spark.readStream \
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("subscribe", "aerodromos_topico") \
-        .option("startingOffsets", "latest") \
+        .option("startingOffsets", "earliest") \
         .load()
 
     zonas_topico = spark.readStream \
         .format("kafka") \
         .option("kafka.bootstrap.servers", kafka_bootstrap_servers) \
         .option("subscribe", "zonas_topico") \
-        .option("startingOffsets", "latest") \
+        .option("startingOffsets", "earliest") \
         .load()
 
     # Esquemas de datos
@@ -88,7 +93,8 @@ if __name__ == "__main__":
         col("NivelAvisoTemperatura"),
         col("NivelAvisoViento"),
         col("max_temperatura"),
-        col("max_intensidad_viento")
+        col("max_intensidad_viento"),
+        col("start")
     ).withColumn(
         "MensajeAviso",
         when(col("NivelAvisoTemperatura").isNotNull(),

@@ -1,57 +1,42 @@
 import os
+import sys
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, struct, to_json
-from pyspark.sql.types import StructType, StringType, DoubleType, BooleanType
-from pyspark.sql.types import StructField
-from pyspark.ml.feature import VectorAssembler, StandardScaler
-from pyspark.ml.clustering import BisectingKMeans
-from pyspark.ml.linalg import Vectors
+from pyspark.sql.functions import col
+from pyspark.ml.feature import VectorAssembler
 from sklearn.ensemble import IsolationForest
-import numpy as np
 import pandas as pd
+from functools import partial
 
-os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-streaming_2.12:3.5.3,org.apache.spark:spark-sql-kafka-0-10_2.12:3.5.3 pyspark-shell'
+# Configurar PySpark para usar el Python del entorno virtual actual
+os.environ['PYSPARK_PYTHON'] = sys.executable
+os.environ['PYSPARK_DRIVER_PYTHON'] = sys.executable
 
 # Configuración de la sesión Spark
 spark = SparkSession.builder \
-    .appName("Deteccion_Anomalias") \
+    .appName("Batch_Deteccion_Anomalias") \
+    .config("spark.sql.parquet.int96AsTimestamp", "true") \
     .config("spark.executor.memory", "4g") \
     .config("spark.driver.memory", "2g") \
     .getOrCreate()
 
-# Esquema de los datos JSON
-schema = StructType() \
-    .add("CodigoOACI", StringType()) \
-    .add("max_intensidad_viento", DoubleType()) \
-    .add("max_temperatura", DoubleType()) \
-    .add("min_temperatura", DoubleType()) \
-    .add("mean_temperatura", DoubleType()) \
-    .add("max_humedad_relativa", DoubleType()) \
-    .add("min_humedad_relativa", DoubleType()) \
-    .add("mean_humedad_relativa", DoubleType()) \
-    .add("max_punto_rocio", DoubleType()) \
-    .add("min_punto_rocio", DoubleType()) \
-    .add("min_presion", DoubleType()) \
-    .add("max_presion", DoubleType()) \
-    .add("max_visibilidad", DoubleType()) \
-    .add("min_visibilidad", DoubleType()) \
-    .add("hubo_precipitacion", BooleanType()) \
-    .add("cobertura_predominante", StringType()) \
-    .add("start", StringType()) \
-    .add("end", StringType())
+# Ruta del DataLake
+data_path = "c:/spark-datalake/calculos_24h"
 
-# Leer datos desde Kafka
-kafka_input_stream = spark.readStream \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", "localhost:9092") \
-    .option("subscribe", "calculos_24h") \
-    .option("startingOffsets", "earliest") \
-    .load()
+# Leer datos Parquet
+data = spark.read.parquet(data_path)
 
-# Extraer y convertir los datos JSON
-data = kafka_input_stream.selectExpr("CAST(value AS STRING) as json_string") \
-    .select(from_json(col("json_string"), schema).alias("data")) \
-    .select("data.*")
+# Lista de nombres de columnas
+column_names = data.schema.names
+
+# Validar el DataFrame original
+print("Número de registros en el DataFrame original (data):", data.count())
+print("Esquema del DataFrame original (data):")
+data.printSchema()
+
+# Convertir las columnas start y end a StringType si es necesario
+data = data.withColumn("start", col("start").cast("string"))
+data = data.withColumn("end", col("end").cast("string"))
+
 
 # Preparar los datos para el modelo Isolation Forest
 features = [
@@ -64,35 +49,46 @@ features = [
 assembler = VectorAssembler(inputCols=features, outputCol="features")
 data_vectorized = assembler.transform(data)
 
-# Convertir los datos a Pandas para Isolation Forest
-def detect_anomalies_in_batch(iterator):
-    batch_data = list(iterator)
-    if len(batch_data) > 0:
-        pdf = pd.DataFrame(batch_data, columns=features)
-        iso_forest = IsolationForest(contamination=0.05, random_state=42)
-        pdf["anomaly"] = iso_forest.fit_predict(pdf)
-        pdf["anomaly"] = pdf["anomaly"].map({1: "Normal", -1: "Anomaly"})
-        return pdf.values.tolist()
-    return []
+# Función para detectar anomalías
+def detect_anomalies_in_partition(partition_data, column_names):
+    partition_list = list(partition_data)
+    print("Número de registros en la partición:", len(partition_list))
+    
+    if not partition_list:
+        return []  # No procesar particiones vacías
 
+    # Convertir partición a Pandas DataFrame
+    pdf = pd.DataFrame(partition_list, columns=column_names)
 
-result_schema = StructType(data.schema.fields + [StructField("anomaly", StringType(), True)])
-data_anomalies = data_vectorized.rdd.mapPartitions(detect_anomalies_in_batch).toDF(schema=result_schema)
+    if pdf.empty:
+        print("La partición está vacía después de la conversión a Pandas.")
+        return []
 
-# Publicar resultados en Kafka
-result_stream = data_anomalies.select(to_json(struct([col(c) for c in data_anomalies.columns])).alias("value"))
-result_stream.writeStream \
-    .format("kafka") \
-    .option("kafka.bootstrap.servers", "localhost:9092") \
-    .option("topic", "control_calidad") \
-    .option("checkpointLocation", "./checkpoints/anomalies") \
-    .start()
+    # Entrenar el Isolation Forest con las características seleccionadas
+    iso_forest = IsolationForest(contamination=0.05, random_state=42)
+    pdf["anomaly"] = iso_forest.fit_predict(pdf[features])
+    pdf["anomaly"] = pdf["anomaly"].map({1: "Normal", -1: "Anomaly"})
+    
+    # Devolver todas las columnas originales más la columna "anomaly"
+    return pdf.to_dict(orient="records")
+
+# Crear una versión parcial de la función
+detect_anomalies_with_columns = partial(detect_anomalies_in_partition, column_names=column_names)
+
+# Aplicar el modelo en cada partición y convertir los resultados a un DataFrame
+data_rdd = data.rdd.mapPartitions(detect_anomalies_with_columns)
+data_anomalies = spark.createDataFrame(data_rdd)
+
+# Validar el DataFrame de salida
+print("Esquema del DataFrame de salida (data_anomalies):")
+data_anomalies.printSchema()
+
+print("Número de registros en el DataFrame de salida (data_anomalies):", data_anomalies.count())
 
 # Guardar resultados en el DataLake
-result_stream.writeStream \
-    .format("parquet") \
-    .option("path", "./datalake/anomalies") \
-    .option("checkpointLocation", "./checkpoints/datalake") \
-    .start()
-
-spark.streams.awaitAnyTermination()
+output_path = "c:/spark-datalake/control_calidad_24h"
+if data_anomalies.count() > 0:
+    data_anomalies.write.mode("overwrite").partitionBy("CodigoOACI").parquet(output_path)
+    print("Proceso completado. Resultados guardados en:", output_path)
+else:
+    print("El DataFrame de salida (data_anomalies) está vacío. No se escribió ningún archivo.")
