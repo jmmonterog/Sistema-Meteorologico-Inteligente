@@ -1,7 +1,8 @@
 import os
 from pyspark.sql import SparkSession
-from pyspark.sql.functions import col, from_json, to_json, struct, udf
+from pyspark.sql.functions import col, from_json, to_json, struct, lit, udf
 from pyspark.sql.types import StructType, StringType, DoubleType, BooleanType
+import pandas as pd
 from transformers import pipeline
 import sys
 
@@ -14,7 +15,7 @@ os.environ['PYSPARK_SUBMIT_ARGS'] = '--packages org.apache.spark:spark-streaming
 
 # Crear la sesión Spark
 spark = SparkSession.builder \
-    .appName("Generar_Informes_Meteorologicos_NLP") \
+    .appName("Generar_Informes_Meteorologicos") \
     .config("spark.executor.memory", "4g") \
     .config("spark.driver.memory", "2g") \
     .getOrCreate()
@@ -53,49 +54,36 @@ data = kafka_input_stream.selectExpr("CAST(value AS STRING) as json_string") \
     .select(from_json(col("json_string"), schema).alias("data")) \
     .select("data.*")
 
-# Cargar el modelo de NLP preentrenado
-summarizer = pipeline("summarization", model="facebook/bart-large-cnn")
-
-# Función para generar resúmenes utilizando el modelo NLP
-def generar_resumen_nlp(codigo_oaci, start, end, viento, temperatura, precipitacion, cobertura):
-    texto_base = (
-        f"El día con inicio {start} y fin {end} en el aeródromo {codigo_oaci} se registraron las siguientes condiciones: "
-        f"viento máximo de {viento} km/h, temperaturas entre {temperatura['min']}°C y {temperatura['max']}°C "
-        f"con una media de {temperatura['mean']}°C, "
-        f"cobertura nubosa predominante '{cobertura}', "
-        f"y {'hubo' if precipitacion else 'no hubo'} precipitaciones."
-    )
-    resumen = summarizer(texto_base, max_length=50, min_length=25, do_sample=False)
-    return resumen[0]['summary_text']
-
-# Registrar la función como UDF
+# Generar resúmenes en el DataFrame
 @udf(returnType=StringType())
-def generar_resumen_udf(codigo_oaci, start, end, max_intensidad_viento, min_temperatura, max_temperatura, mean_temperatura, hubo_precipitacion, cobertura_predominante):
-    temperatura = {
-        "min": min_temperatura,
-        "max": max_temperatura,
-        "mean": mean_temperatura
-    }
-    return generar_resumen_nlp(codigo_oaci, start, end, max_intensidad_viento, temperatura, hubo_precipitacion, cobertura_predominante)
+def generar_resumen(row):
+    """Generar resumen directamente desde una fila."""
+    resumen = []
+    resumen.append(f"El día con inicio {row['start']} y fin {row['end']} en el aeródromo {row['CodigoOACI']} se registraron las siguientes condiciones:")
+    if row['max_intensidad_viento'] > 20:
+        resumen.append(f"Hubo vientos fuertes con una intensidad máxima de {row['max_intensidad_viento']} km/h.")
+    else:
+        resumen.append(f"Los vientos fueron moderados, alcanzando un máximo de {row['max_intensidad_viento']} km/h.")
+    resumen.append(f"La cobertura nubosa predominante fue '{row['cobertura_predominante']}'.")
+    if row['hubo_precipitacion']:
+        resumen.append("Se registraron precipitaciones durante el periodo.")
+    else:
+        resumen.append("No se registraron precipitaciones durante el periodo.")
+    resumen.append(f"La temperatura osciló entre {row['min_temperatura']}°C y {row['max_temperatura']}°C, con una media de {row['mean_temperatura']}°C.")
+    resumen.append(f"La visibilidad máxima alcanzada fue de {row['max_visibilidad']} metros.")
+    return " ".join(resumen)
 
-# Agregar el resumen generado al DataFrame
-data = data.withColumn(
-    "Resumen",
-    generar_resumen_udf(
-        col("CodigoOACI"), col("start"), col("end"), col("max_intensidad_viento"),
-        col("min_temperatura"), col("max_temperatura"), col("mean_temperatura"),
-        col("hubo_precipitacion"), col("cobertura_predominante")
-    )
-)
+data = data.withColumn("Resumen", generar_resumen(struct([col(c) for c in data.columns])))
 
 # Publicar resúmenes en el tópico Kafka resúmenes_meteorologicos
-data.select(to_json(struct([col("CodigoOACI"), col("Resumen")])).alias("value")) \
-    .writeStream \
+resumen_stream = data.select(to_json(struct([col("CodigoOACI"), col("Resumen")])).alias("value"))
+resumen_stream.writeStream \
     .format("kafka") \
     .option("kafka.bootstrap.servers", "localhost:9092") \
     .option("topic", "resumenes_meteorologicos") \
     .option("checkpointLocation", "c:/spark-checkpoint/kafka_resumenes") \
     .start()
+
 
 # Guardar resúmenes en Parquet
 output_path = "c:/spark-datalake/informes_meteorologicos"
