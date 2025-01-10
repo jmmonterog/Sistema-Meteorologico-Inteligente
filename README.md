@@ -55,15 +55,15 @@ El sistema consta de los siguientes módulos principales:
      - Redes Neuronales (RNN) para predicción de series temporales.
      - Modelos de regresión para tendencias climáticas.
 
-4. **Visualización y alertas**:
-   - Generación de dashboards interactivos con herramientas como Plotly.
-   - Automatización de alertas para fenómenos meteorológicos adversos mediante notificaciones integradas.
+4. **Automatizaciones**:
+   - Automatización de avisos para fenómenos meteorológicos adversos con los mismos umbrales que el Plan Meteoalerta.
+   - Automatización de generación de boletines de predicción meteorológica general en lenguaje natural mediante técnicas de NLP. 
 
 ## **Cómo Usar**
 ### **Instalación**
 1. Clona el repositorio en tu máquina local:
    ```bash
-   git clone https://github.com/tu_usuario/Sistema-Meteorologico-Inteligente.git
+   git clone https://github.com/jmmonterog/Sistema-Meteorologico-Inteligente
    cd Sistema-Meteorologico-Inteligente
    ```
 
